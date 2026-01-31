@@ -9,13 +9,9 @@ class SocketClient {
 
   connect(serverUrl = '') {
     // Auto-detect server URL if not provided
-    let url = serverUrl;
-    
-    if (!url) {
-      // Use window.location.origin which includes the full host + port
-      url = window.location.origin;
-      console.log('Connecting to:', url);
-    }
+    // Prefer explicit serverUrl, then global `window.SERVER_URL`, then current origin
+    let url = serverUrl || (window.SERVER_URL && window.SERVER_URL.length ? window.SERVER_URL : window.location.origin);
+    console.log('Connecting to:', url);
     
     this.socket = io(url, {
       reconnection: true,

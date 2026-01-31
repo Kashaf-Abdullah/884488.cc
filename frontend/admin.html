@@ -436,6 +436,10 @@
     </style>
 </head>
 <body>
+        <script>
+            // Optional: set at deploy time to backend URL, e.g. https://api.example.com
+            window.SERVER_URL = window.SERVER_URL || '';
+        </script>
     <!-- Login Section -->
     <div id="loginSection" class="login-container">
         <div class="login-card">
@@ -668,7 +672,7 @@
     
     <script>
         // API base URL
-        const API_BASE_URL =  'https://automatic-waffle-94wx66pp7p43pqg9.github.dev/' 
+        const API_BASE_URL = window.SERVER_URL && window.SERVER_URL.length ? window.SERVER_URL : 'https://automatic-waffle-94wx66pp7p43pqg9.github.dev/';
           
         
         let adminAuthenticated = false;

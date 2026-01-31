@@ -352,8 +352,8 @@
             }
 
             connect(serverUrl = '') {
-                const url = serverUrl || window.location.origin;
-                
+                const url = serverUrl || (window.SERVER_URL && window.SERVER_URL.length ? window.SERVER_URL : window.location.origin);
+
                 this.socket = io(url, {
                     transports: ['websocket', 'polling'],
                     reconnection: true,
@@ -405,7 +405,8 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             mobileClient = new MobileClient();
-            const API_BASE_URL = window.location.origin;
+            window.SERVER_URL = window.SERVER_URL || '';
+            const API_BASE_URL = window.SERVER_URL && window.SERVER_URL.length ? window.SERVER_URL : window.location.origin;
             socket = mobileClient.connect(API_BASE_URL);
 
             socket.on('mobile:paired', (data) => {

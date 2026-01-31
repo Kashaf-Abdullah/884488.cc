@@ -205,6 +205,10 @@
             }
         }
     </style>
+    <script>
+        // Optional: set at deploy time to backend URL, e.g. https://api.example.com
+        window.SERVER_URL = window.SERVER_URL || '';
+    </script>
 </head>
 <body>
     <div class="main-container">
@@ -346,7 +350,7 @@
         }
 
         const desktopClient = new DesktopClient();
-        const API_BASE_URL = window.location.origin;
+        const API_BASE_URL = window.SERVER_URL && window.SERVER_URL.length ? window.SERVER_URL : window.location.origin;
         const socket = desktopClient.connect(API_BASE_URL);
 
         socket.on('desktop:code', (data) => {

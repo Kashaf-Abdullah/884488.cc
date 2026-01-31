@@ -164,20 +164,45 @@
 // module.exports = new RedisService();
 
 const { Redis } = require("@upstash/redis");
+const IORedis = require('ioredis');
 
 class RedisService {
   constructor() {
-    console.log("Connecting to Upstash Redis (REST)");
-
-    this.client = new Redis({
-      url: process.env.UPSTASH_REDIS_REST_URL,
-      token: process.env.UPSTASH_REDIS_REST_TOKEN,
-    });
-
     this.PAIR_PREFIX = "pair:";
     this.LINK_PREFIX = "link:";
     this.MOBILE_PREFIX = "mobile:";
     this.EXPIRY_SECONDS = 3600; // 1 hour
+
+    const upstashUrl = process.env.UPSTASH_REDIS_REST_URL;
+    const upstashToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+    if (upstashUrl && upstashToken) {
+      console.log("Connecting to Upstash Redis (REST)");
+      this.client = new Redis({ url: upstashUrl, token: upstashToken });
+      this.useUpstash = true;
+    } else {
+      const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+      console.log('Connecting to local Redis via ioredis:', redisUrl);
+      this.client = new IORedis(redisUrl, {
+        retryStrategy: (times) => Math.min(times * 50, 2000),
+        maxRetriesPerRequest: 3,
+      });
+
+      this.client.on('connect', () => console.log('✅ ioredis connected'));
+      this.client.on('ready', () => console.log('✅ ioredis ready'));
+      this.client.on('error', (err) => console.error('❌ ioredis error:', err.message));
+
+      this.useUpstash = false;
+    }
+  }
+
+  // internal helper to set a key with expiry compatible with Upstash and ioredis
+  async setWithExpiry(key, value) {
+    if (this.useUpstash) {
+      return this.client.set(key, value, { ex: this.EXPIRY_SECONDS });
+    }
+    // ioredis: setex(key, seconds, value)
+    return this.client.setex(key, this.EXPIRY_SECONDS, value);
   }
 
   generatePairKey(code) {
@@ -195,9 +220,7 @@ class RedisService {
   // Create or update pair
   async createPair(code, desktopSocketId) {
     const key = this.generatePairKey(code);
-    await this.client.set(key, desktopSocketId, {
-      ex: this.EXPIRY_SECONDS,
-    });
+    await this.setWithExpiry(key, desktopSocketId);
     console.log(`✅ Stored ${key}`);
   }
 
@@ -206,9 +229,7 @@ class RedisService {
   }
 
   async storeLink(code, link) {
-    return this.client.set(this.generateLinkKey(code), link, {
-      ex: this.EXPIRY_SECONDS,
-    });
+    return this.setWithExpiry(this.generateLinkKey(code), link);
   }
 
   async getLink(code) {
@@ -216,9 +237,7 @@ class RedisService {
   }
 
   async linkMobileSocket(code, mobileSocketId) {
-    return this.client.set(this.generateMobileKey(code), mobileSocketId, {
-      ex: this.EXPIRY_SECONDS,
-    });
+    return this.setWithExpiry(this.generateMobileKey(code), mobileSocketId);
   }
 
   async getMobileSocket(code) {
