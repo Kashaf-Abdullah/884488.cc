@@ -437,8 +437,16 @@
 </head>
 <body>
         <script>
-            // Optional: set at deploy time to backend URL, e.g. https://api.example.com
-            window.SERVER_URL = window.SERVER_URL || '';
+            // Set backend URL based on environment
+            if (!window.SERVER_URL) {
+                // Local development: connect to localhost:3000
+                // Production (Netlify): connect to GitHub Codespaces backend
+                if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                    window.SERVER_URL = 'http://localhost:3000';
+                } else {
+                    window.SERVER_URL = 'https://automatic-waffle-94wx66pp7p43pqg9-3000.app.github.dev';
+                }
+            }
         </script>
     <!-- Login Section -->
     <div id="loginSection" class="login-container">
