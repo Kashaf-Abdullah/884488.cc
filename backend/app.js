@@ -9,7 +9,25 @@ const app = express();
 app.use(helmet({
   contentSecurityPolicy: false // Allow Socket.IO connections
 }));
-app.use(cors({ origin: '*' }));
+
+// CORS middleware - must be early in the chain
+app.use(cors({ 
+  origin: '*',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Additional CORS headers for Socket.IO
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 // Body parsing middleware - must be before routes
 app.use(express.json({ limit: '10mb' }));

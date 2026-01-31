@@ -64,19 +64,6 @@ new SocketController(io);
 const { initializePairingRoutes } = require('./routes/pairingRoutes');
 initializePairingRoutes(io);
 
-// Also update the app.js to handle CORS better for Socket.IO
-// Add this to your app.js, right after helmet middleware:
-
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
-  next();
-});
-
 const PORT = process.env.PORT || 3000;
 console.log("REDIS URL:", process.env.UPSTASH_REDIS_REST_URL ? "✅ set" : "❌ missing");
 console.log("REDIS TOKEN:", process.env.UPSTASH_REDIS_REST_TOKEN ? "✅ set" : "❌ missing");

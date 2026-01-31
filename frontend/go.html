@@ -405,9 +405,8 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             mobileClient = new MobileClient();
-            const API_BASE_URL = 'https://automatic-waffle-94wx66pp7p43pqg9.github.dev/' 
-              
-            socket = mobileClient.connect(API_BASE_URL || 'https://automatic-waffle-94wx66pp7p43pqg9.github.dev/');
+            const API_BASE_URL = window.location.origin;
+            socket = mobileClient.connect(API_BASE_URL);
 
             socket.on('mobile:paired', (data) => {
                 mobileClient.isPaired = true;

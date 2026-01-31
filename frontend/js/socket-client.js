@@ -9,13 +9,22 @@ class SocketClient {
 
   connect(serverUrl = '') {
     // Auto-detect server URL if not provided
-    const url = serverUrl || window.location.origin;
+    let url = serverUrl;
+    
+    if (!url) {
+      // Use window.location.origin which includes the full host + port
+      url = window.location.origin;
+      console.log('Connecting to:', url);
+    }
     
     this.socket = io(url, {
       reconnection: true,
       reconnectionDelay: this.reconnectDelay,
       reconnectionAttempts: this.maxReconnectAttempts,
-      timeout: 20000
+      timeout: 20000,
+      transports: ['websocket', 'polling'],
+      secure: window.location.protocol === 'https:',
+      rejectUnauthorized: false
     });
 
     this.setupEventHandlers();
