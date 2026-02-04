@@ -15,6 +15,9 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3001',
   'http://127.0.0.1:3000',
+  'https://localhost:3000',
+  'https://localhost:3001',
+  'https://127.0.0.1:3000',
   'https://codeconnect01.netlify.app',
   'https://automatic-waffle-94wx66pp7p43pqg9-3000.app.github.dev'
 ];
