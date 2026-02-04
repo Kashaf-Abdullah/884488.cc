@@ -43,14 +43,24 @@ const app = require('./app');
 const server = http.createServer(app);
 
 // Create io instance with proper CORS configuration
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://127.0.0.1:3000",
+  "https://codeconnect01.netlify.app",
+  "https://automatic-waffle-94wx66pp7p43pqg9-3000.app.github.dev"
+];
+
 const io = socketIo(server, {
   cors: {
-    origin: "*",
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
-    credentials: true
+    credentials: true,
+    allowEIO3: true
   },
-  transports: ['websocket', 'polling'], // Explicitly set transports
-  allowEIO3: true // For Socket.IO v2 compatibility
+  transports: ['websocket', 'polling'],
+  secure: true,
+  rejectUnauthorized: false
 });
 
 // Make io available to app

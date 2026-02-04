@@ -19,8 +19,9 @@ class SocketClient {
       reconnectionAttempts: this.maxReconnectAttempts,
       timeout: 20000,
       transports: ['websocket', 'polling'],
-      secure: window.location.protocol === 'https:',
-      rejectUnauthorized: false
+      secure: true,
+      rejectUnauthorized: false,
+      forceNew: true
     });
 
     this.setupEventHandlers();
