@@ -53,7 +53,22 @@ const allowedOrigins = [
 
 const io = socketIo(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: function(origin, callback) {
+      const allowedOrigins = [
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3000",
+        "https://codeconnect01.netlify.app",
+        "https://automatic-waffle-94wx66pp7p43pqg9-3000.app.github.dev"
+      ];
+      
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.warn('CORS blocked origin:', origin);
+        callback(new Error('CORS not allowed'), false);
+      }
+    },
     methods: ["GET", "POST"],
     credentials: true,
     allowEIO3: true

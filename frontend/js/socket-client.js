@@ -9,11 +9,10 @@ class SocketClient {
 
   connect(serverUrl = '') {
     // Auto-detect server URL if not provided
-    // Prefer explicit serverUrl, then global `window.SERVER_URL`, then current origin
     let url = serverUrl || (window.SERVER_URL && window.SERVER_URL.length ? window.SERVER_URL : window.location.origin);
-    console.log('Connecting to:', url);
+    console.log('Attempting to connect to:', url);
     
-    this.socket = io(url, {
+    const socketOptions = {
       reconnection: true,
       reconnectionDelay: this.reconnectDelay,
       reconnectionAttempts: this.maxReconnectAttempts,
@@ -21,8 +20,14 @@ class SocketClient {
       transports: ['websocket', 'polling'],
       secure: true,
       rejectUnauthorized: false,
-      forceNew: true
-    });
+      forceNew: false,
+      upgrade: true,
+      rememberUpgrade: true,
+      withCredentials: true
+    };
+    
+    console.log('Socket options:', socketOptions);
+    this.socket = io(url, socketOptions);
 
     this.setupEventHandlers();
     return this.socket;
